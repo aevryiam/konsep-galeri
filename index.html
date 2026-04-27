@@ -1,423 +1,643 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIONIR 2026 - Interactive Animation Concept</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Showcase Animasi Galeri PIONIR 2026</title>
 
-    <!-- Chosen Palette: Warm neutral background (orange-50), vibrant PIONIR accents (blue-500, yellow-400, red-500, teal-400, purple-500) representing the cheerful Grand Design. -->
-    <!-- Application Structure Plan: A dashboard-style presentation that translates the static report into a living prototype. It includes a contextual intro, a data-driven UX analysis (Chart.js), and interactive sandbox areas where users can physically test the "Bento Dinamis" and "Lorong Berjalan" GSAP animations, maximizing understanding through direct interaction. -->
-    <!-- Visualization & Content Choices: Context Text -> Intro -> Sets the stage. UX Metrics -> Chart.js Bar Chart -> Quantifies the 'why' behind avoiding scroll-jacking. Animation Concepts -> Interactive DOM Elements with GSAP -> Allows users to feel the "Anyaman" hover and layout effects directly without abstract explanations. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Import Font DM Sans sesuai Visual Guideline -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Import Tailwind & GSAP + Draggable Plugin -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
 
     <style>
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: #FFFDF8;
-            color: #1A1A1A;
-            overflow-x: hidden;
-        }
-        
-        .pionir-shadow {
-            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.15);
-        }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background-color: #fffdf8;
+        margin: 0;
+        overflow-x: hidden;
+        background-image: radial-gradient(#e5e7eb 2px, transparent 2px);
+        background-size: 24px 24px;
+      }
 
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 40vh;
-            max-height: 400px;
-        }
+      /* Container tiap section */
+      .concept-section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+        padding-top: 80px; /* space for navbar */
+        padding-bottom: 40px;
+      }
 
-        .anyaman-pattern {
-            background-image: radial-gradient(#E5E7EB 2px, transparent 2px);
-            background-size: 20px 20px;
-        }
+      .no-select {
+        -webkit-user-select: none;
+        user-select: none;
+      }
 
-        .hide-scroll::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scroll {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+      /* Konsep 1: Bento */
+      .bento-marquee-wrapper {
+        cursor: grab;
+      }
+      .bento-marquee-wrapper:active {
+        cursor: grabbing;
+      }
+
+      /* Konsep 3: Scatter */
+      .scatter-area {
+        touch-action: none; /* Mencegah scroll layar saat nge-drag di mobile */
+        background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+      .polaroid {
+        cursor: grab;
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+      }
+      .polaroid:active {
+        cursor: grabbing;
+      }
+
+      /* Konsep 4: Tirai */
+      .tirai-bilah {
+        transform-origin: center;
+      }
     </style>
-</head>
-<body class="antialiased anyaman-pattern">
-
-    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex-shrink-0 flex items-center gap-2">
-                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">P</div>
-                    <span class="font-bold text-xl tracking-tight">PIONIR 2026 UI/UX</span>
-                </div>
-                <div class="hidden md:flex space-x-8">
-                    <button onclick="document.getElementById('analisis').scrollIntoView({behavior: 'smooth'})" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Analisis UX</button>
-                    <button onclick="document.getElementById('bento').scrollIntoView({behavior: 'smooth'})" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Bento Dinamis</button>
-                    <button onclick="document.getElementById('lorong').scrollIntoView({behavior: 'smooth'})" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Lorong Berjalan</button>
-                </div>
-            </div>
+  </head>
+  <body>
+    <!-- Navigasi untuk memudahkan presentasi -->
+    <nav
+      class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md z-50 shadow-sm border-b border-gray-200"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between"
+      >
+        <div class="font-bold text-lg text-blue-600">PIONIR 2026 Showcase</div>
+        <div
+          class="flex gap-4 overflow-x-auto hide-scrollbar text-sm font-medium text-gray-600"
+        >
+          <a href="#konsep-1" class="hover:text-blue-600 whitespace-nowrap"
+            >1. Bento Dinamis</a
+          >
+          <a href="#konsep-2" class="hover:text-blue-600 whitespace-nowrap"
+            >2. Lorong Berjalan</a
+          >
+          <a href="#konsep-3" class="hover:text-blue-600 whitespace-nowrap"
+            >3. Meja Interaktif</a
+          >
+          <a href="#konsep-4" class="hover:text-blue-600 whitespace-nowrap"
+            >4. Tirai Pembuka</a
+          >
         </div>
+      </div>
     </nav>
 
-    <main class="pt-24 pb-16">
-        <header class="max-w-4xl mx-auto px-4 text-center mb-16">
-            <span class="inline-block py-1 px-3 rounded-full bg-orange-100 text-orange-800 font-medium text-sm mb-4">Laporan Interaktif & Prototipe</span>
-            <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">Konsep Animasi Galeri <br><span class="text-blue-600">PIONIR Gadjah Mada</span></h1>
-            <p class="text-lg text-gray-600 leading-relaxed mb-8">
-                Visualisasi interaktif dari laporan arsitektur informasi galeri. Mengeksplorasi pendekatan <strong>Non-Scroll-Jacking</strong> menggunakan <strong>GSAP</strong> dengan mengusung tema visual <strong>"Anyaman"</strong> yang merepresentasikan elemen yang saling menyilang, mengikat, ceria, dan dinamis.
-            </p>
-            <div class="flex flex-wrap justify-center gap-4">
-                <div class="px-4 py-2 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center gap-2">
-                    <div class="w-4 h-4 rounded-full bg-[#1A1A1A]"></div> <span class="font-medium">DM Sans</span>
-                </div>
-                <div class="px-4 py-2 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center gap-2">
-                    <span class="font-bold">Drop Shadow:</span> <span>15% Opacity, 10pt Y</span>
-                </div>
-                <div class="px-4 py-2 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center gap-2">
-                    <span class="font-bold text-xl">⛶</span> <span>Sudut Membulat (Rounded)</span>
-                </div>
-            </div>
-        </header>
+    <!-- ==========================================
+         KONSEP 1: BENTO ANYAMAN DINAMIS
+         ========================================== -->
+    <section
+      id="konsep-1"
+      class="concept-section border-b-2 border-dashed border-gray-300"
+    >
+      <div class="text-center mb-8 px-4 z-0">
+        <span
+          class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 inline-block"
+          >Konsep 1</span
+        >
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          Bento Anyaman Dinamis
+        </h1>
+        <p class="text-gray-500 font-medium max-w-lg mx-auto">
+          Interaksi Hover & Auto-Scroll. Kotak akan membesar dramatis
+          (Unweaving) saat disentuh/kursor.
+        </p>
+      </div>
 
-        <section id="bento" class="max-w-6xl mx-auto px-4 mb-24">
-            <div class="mb-8 md:flex md:items-end md:justify-between">
-                <div class="max-w-2xl">
-                    <h2 class="text-3xl font-bold mb-4 flex items-center gap-3">
-                        <span class="bg-blue-100 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-xl">🖱️</span>
-                        Konsep 1: Bento Anyaman Dinamis
-                    </h2>
-                    <p class="text-gray-600 text-lg">
-                        Simulasi tata letak bergaya Bento Box. <strong>Arahkan kursor (desktop) atau sentuh kotak (mobile)</strong> untuk melihat efek <em>"Unweaving"</em> yang dramatis. Kotak yang disorot akan membesar secara signifikan, sementara kotak lain merenggang mundur, dan baris ini akan terus berjalan mengalir ke kiri.
-                    </p>
-                </div>
-                <div class="mt-4 md:mt-0 px-4 py-2 bg-blue-50 text-blue-800 rounded-xl font-medium text-sm border border-blue-100">
-                    Interaksi: Hover / Touch & Auto-play
-                </div>
-            </div>
+      <div class="w-full relative py-5" id="anim-area-1">
+        <div
+          class="bento-marquee-wrapper relative h-[400px] md:h-[450px] w-full"
+        >
+          <div
+            class="bento-marquee-content flex gap-4 absolute left-0 top-0 h-full w-max px-4"
+          >
+            <!-- Blok Bento akan di-generate via JS untuk kerapian -->
+            <div
+              id="bento-grid-1"
+              class="grid grid-cols-4 gap-4 w-[850px] md:w-[1100px] h-full grid-rows-2 relative z-10 no-select"
+            ></div>
+            <div
+              id="bento-grid-2"
+              class="grid grid-cols-4 gap-4 w-[850px] md:w-[1100px] h-full grid-rows-2 relative z-10 no-select"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <div class="bg-gray-100 p-4 md:p-8 rounded-3xl overflow-hidden relative">
-                
-                <!-- Wrapper baru untuk Infinite Horizontal Scroll -->
-                <div class="bento-marquee-wrapper relative h-[400px] md:h-[450px] w-full cursor-grab active:cursor-grabbing">
-                    <div class="bento-marquee-content flex gap-3 md:gap-4 absolute left-0 top-0 h-full w-max">
-                        
-                        <!-- Grid Block 1 -->
-                        <div class="bento-grid-block grid grid-cols-4 gap-3 md:gap-4 w-[800px] md:w-[1000px] h-full grid-rows-2 relative z-10">
-                            <div class="bento-item col-span-2 row-span-2 bg-blue-500 rounded-3xl p-6 text-white flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold text-2xl mb-1">Upacara Pembukaan</h3>
-                                <p class="text-blue-100 text-sm">Lapangan Pancasila</p>
-                            </div>
-                            <div class="bento-item col-span-1 row-span-1 bg-yellow-400 rounded-3xl p-4 text-yellow-900 flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold">Formasi</h3>
-                                <p class="text-xs opacity-80">20.000 Gamada</p>
-                            </div>
-                            <div class="bento-item col-span-1 row-span-2 bg-teal-400 rounded-3xl p-4 text-teal-900 flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold text-xl mb-1">Panggung Utama</h3>
-                                <p class="text-xs opacity-80">Rektorat</p>
-                            </div>
-                            <div class="bento-item col-span-1 row-span-1 bg-red-500 rounded-3xl p-4 text-white flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold">Fakultas</h3>
-                                <p class="text-xs opacity-80">Sinergi</p>
-                            </div>
-                            <div class="bento-item col-span-1 row-span-1 bg-purple-500 rounded-3xl p-4 text-white flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold">Kreativitas</h3>
-                            </div>
-                            <div class="bento-item col-span-2 row-span-1 bg-orange-400 rounded-3xl p-4 text-orange-950 flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold text-xl">Closing Ceremony</h3>
-                                <p class="text-sm opacity-80">Kemeriahan Penutup</p>
-                            </div>
-                            <div class="bento-item col-span-1 row-span-1 bg-pink-400 rounded-3xl p-4 text-pink-950 flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold">Atribut</h3>
-                            </div>
-                        </div>
+    <!-- ==========================================
+         KONSEP 2: LORONG ANYAMAN BERJALAN
+         ========================================== -->
+    <section
+      id="konsep-2"
+      class="concept-section border-b-2 border-dashed border-gray-300"
+    >
+      <div class="text-center mb-10 px-4 z-0">
+        <span
+          class="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 inline-block"
+          >Konsep 2</span
+        >
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          Lorong Anyaman Berjalan
+        </h1>
+        <p class="text-gray-500 font-medium max-w-lg mx-auto">
+          Baris berjalan beda arah. Ujung kotak saling tumpang tindih ala
+          anyaman. Hover untuk pause.
+        </p>
+      </div>
 
-                        <!-- Grid Block 2 (Duplikat untuk ilusi loop berulang tanpa batas) -->
-                        <div class="bento-grid-block grid grid-cols-4 gap-3 md:gap-4 w-[800px] md:w-[1000px] h-full grid-rows-2 relative z-10">
-                            <div class="bento-item col-span-2 row-span-2 bg-blue-500 rounded-3xl p-6 text-white flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold text-2xl mb-1">Upacara Pembukaan</h3>
-                                <p class="text-blue-100 text-sm">Lapangan Pancasila</p>
-                            </div>
-                            <div class="bento-item col-span-1 row-span-1 bg-yellow-400 rounded-3xl p-4 text-yellow-900 flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold">Formasi</h3>
-                                <p class="text-xs opacity-80">20.000 Gamada</p>
-                            </div>
-                            <div class="bento-item col-span-1 row-span-2 bg-teal-400 rounded-3xl p-4 text-teal-900 flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold text-xl mb-1">Panggung Utama</h3>
-                                <p class="text-xs opacity-80">Rektorat</p>
-                            </div>
-                            <div class="bento-item col-span-1 row-span-1 bg-red-500 rounded-3xl p-4 text-white flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold">Fakultas</h3>
-                                <p class="text-xs opacity-80">Sinergi</p>
-                            </div>
-                            <div class="bento-item col-span-1 row-span-1 bg-purple-500 rounded-3xl p-4 text-white flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold">Kreativitas</h3>
-                            </div>
-                            <div class="bento-item col-span-2 row-span-1 bg-orange-400 rounded-3xl p-4 text-orange-950 flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold text-xl">Closing Ceremony</h3>
-                                <p class="text-sm opacity-80">Kemeriahan Penutup</p>
-                            </div>
-                            <div class="bento-item col-span-1 row-span-1 bg-pink-400 rounded-3xl p-4 text-pink-950 flex flex-col justify-end transition-colors origin-center relative cursor-pointer">
-                                <h3 class="font-bold">Atribut</h3>
-                            </div>
-                        </div>
+      <div class="w-full max-w-6xl mx-auto relative px-4 overflow-hidden">
+        <!-- Track 1 (Kiri) -->
+        <div
+          class="lorong-track h-32 mb-4 relative flex w-[200vw]"
+          id="track-1"
+        ></div>
+        <!-- Track 2 (Kanan) -->
+        <div
+          class="lorong-track h-32 mb-4 relative flex w-[200vw]"
+          id="track-2"
+        ></div>
+        <!-- Track 3 (Kiri) -->
+        <div
+          class="lorong-track h-32 relative flex w-[200vw]"
+          id="track-3"
+        ></div>
+      </div>
+    </section>
 
-                    </div>
-                </div>
-            </div>
-        </section>
+    <!-- ==========================================
+         KONSEP 3: MEJA INTERAKTIF (DRAGGABLE)
+         ========================================== -->
+    <section
+      id="konsep-3"
+      class="concept-section border-b-2 border-dashed border-gray-300"
+    >
+      <div class="text-center mb-6 px-4 z-0">
+        <span
+          class="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 inline-block"
+          >Konsep 3 (Ide Baru)</span
+        >
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          Meja Foto Interaktif
+        </h1>
+        <p class="text-gray-500 font-medium max-w-lg mx-auto">
+          Foto tercecar berantakan. <strong>Tarik/Geser (Drag)</strong> foto
+          sesuka hati. <strong>Klik Ganda (Double Tap)</strong> untuk zoom foto
+          ke tengah.
+        </p>
+      </div>
 
-        <section id="lorong" class="max-w-6xl mx-auto px-4 mb-24">
-            <div class="mb-8 md:flex md:items-end md:justify-between">
-                <div class="max-w-2xl">
-                    <h2 class="text-3xl font-bold mb-4 flex items-center gap-3">
-                        <span class="bg-yellow-100 text-yellow-600 w-10 h-10 rounded-xl flex items-center justify-center text-xl">♾️</span>
-                        Konsep 2: Lorong Anyaman Berjalan
-                    </h2>
-                    <p class="text-gray-600 text-lg">
-                        Galeri otomatis (*auto-play*) yang tidak mengharuskan interaksi klik/scroll. Baris bergerak berlawanan arah. Foto-foto diatur saling menindih (*overlapping* ujungnya) meniru pita anyaman. <strong>Arahkan kursor ke baris untuk menghentikan animasi sejenak (Pause on Hover).</strong>
-                    </p>
-                </div>
-                <div class="mt-4 md:mt-0 px-4 py-2 bg-yellow-50 text-yellow-800 rounded-xl font-medium text-sm border border-yellow-100">
-                    Interaksi: Auto-play & Hover Pause
-                </div>
-            </div>
+      <div
+        class="scatter-area w-11/12 max-w-5xl h-[600px] bg-white rounded-3xl border-4 border-gray-100 relative overflow-hidden flex items-center justify-center"
+      >
+        <!-- Foto-foto Polaroid akan di-generate via JS agar posisinya acak -->
+        <div id="scatter-container" class="absolute inset-0"></div>
+      </div>
+    </section>
 
-            <div class="bg-white rounded-3xl py-12 shadow-sm border border-gray-100 overflow-hidden relative">
-                
-                <div class="marquee-wrapper relative h-40 mb-6" id="track-1">
-                    <div class="marquee-content flex absolute left-0 top-0 h-full">
-                    </div>
-                </div>
+    <!-- ==========================================
+         KONSEP 4: TIRAI PEMBUKA (REVEAL)
+         ========================================== -->
+    <section id="konsep-4" class="concept-section bg-gray-900 text-white">
+      <div class="text-center mb-8 px-4 z-20 relative">
+        <span
+          class="bg-teal-900 text-teal-400 border border-teal-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 inline-block"
+          >Konsep 4</span
+        >
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">
+          Tirai Anyaman PIONIR
+        </h1>
+        <p class="text-gray-400 font-medium max-w-lg mx-auto mb-6">
+          Pola anyaman menutupi layar, lalu terbuka menyibak galeri di baliknya
+          secara dramatis.
+        </p>
+        <button
+          id="btn-replay-tirai"
+          class="bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold py-2 px-6 rounded-full transition-colors relative z-30"
+        >
+          Ulangi Animasi Tirai
+        </button>
+      </div>
 
-                <div class="marquee-wrapper relative h-40" id="track-2">
-                    <div class="marquee-content flex absolute left-0 top-0 h-full">
-                    </div>
-                </div>
+      <div
+        class="w-11/12 max-w-5xl h-[500px] relative rounded-3xl overflow-hidden mx-auto border border-gray-700 shadow-2xl bg-white"
+      >
+        <!-- Konten Galeri di Balik Tirai -->
+        <div
+          class="absolute inset-0 bg-blue-50 flex items-center justify-center p-8"
+        >
+          <div class="grid grid-cols-3 gap-4 w-full h-full relative z-0">
+            <div
+              class="galeri-item bg-blue-500 rounded-2xl shadow-lg border-2 border-white/20"
+            ></div>
+            <div
+              class="galeri-item bg-yellow-400 rounded-2xl shadow-lg border-2 border-white/20"
+            ></div>
+            <div
+              class="galeri-item bg-teal-400 rounded-2xl shadow-lg border-2 border-white/20"
+            ></div>
+            <div
+              class="galeri-item bg-pink-400 rounded-2xl col-span-2 shadow-lg border-2 border-white/20"
+            ></div>
+            <div
+              class="galeri-item bg-purple-500 rounded-2xl shadow-lg border-2 border-white/20"
+            ></div>
+          </div>
 
-            </div>
-        </section>
+          <div
+            id="welcome-text"
+            class="absolute text-4xl md:text-6xl font-bold text-white drop-shadow-2xl text-center pointer-events-none z-10 tracking-tight leading-tight"
+          >
+            SELAMAT DATANG<br />
+            <span class="text-yellow-300 drop-shadow-md">GAMADA 2026</span>
+          </div>
+        </div>
 
-        <section class="max-w-4xl mx-auto px-4 text-center bg-blue-600 text-white rounded-3xl p-10 shadow-lg">
-            <h2 class="text-3xl font-bold mb-4">Kesimpulan Implementasi</h2>
-            <p class="text-blue-100 text-lg mb-8">
-                Pendekatan GSAP dipadukan dengan desain *Grid/Flexbox* Tailwind memastikan animasi tetap berjalan mulus (60fps) tanpa mengorbankan aksesibilitas navigasi vertikal pengguna. Penggunaan bayangan dan sudut melengkung sukses menguatkan identitas visual PIONIR 2026.
-            </p>
-            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="bg-white text-blue-600 px-8 py-3 rounded-full font-bold hover:bg-blue-50 transition-colors">
-                Kembali ke Atas
-            </button>
-        </section>
-
-    </main>
-
-    <footer class="bg-gray-50 border-t border-gray-200 py-8 text-center text-gray-500 font-medium">
-        <p>PIONIR Gadjah Mada 2026 - Interactive Guideline Demo</p>
-    </footer>
+        <!-- Elemen Tirai (Grid Pola Anyaman) -->
+        <div
+          id="tirai-container"
+          class="absolute inset-0 grid grid-cols-10 grid-rows-5 z-20"
+        >
+          <!-- Bilah-bilah akan ditambahkan via JS -->
+        </div>
+      </div>
+    </section>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            const ctx = document.getElementById('uxChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Scroll-Jacking Kaku', 'Scroll Normal (Teks Saja)', 'Bento Dinamis (Hover)', 'Lorong Berjalan (Auto)'],
-                    datasets: [
-                        {
-                            label: 'Kenyamanan Navigasi (Skala 1-100)',
-                            data: [35, 95, 90, 85],
-                            backgroundColor: '#60A5FA',
-                            borderRadius: 6
-                        },
-                        {
-                            label: 'Tingkat Engagement / Eksplorasi Visual (Skala 1-100)',
-                            data: [70, 40, 95, 88],
-                            backgroundColor: '#FBBF24',
-                            borderRadius: 6
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { font: { family: "'DM Sans', sans-serif" } }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            titleFont: { family: "'DM Sans', sans-serif", size: 14 },
-                            bodyFont: { family: "'DM Sans', sans-serif", size: 13 },
-                            padding: 12,
-                            cornerRadius: 8
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { color: '#f3f4f6' },
-                            ticks: { font: { family: "'DM Sans', sans-serif" } }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { family: "'DM Sans', sans-serif" } }
-                        }
-                    }
-                }
+      // Registrasi Plugin GSAP
+      gsap.registerPlugin(Draggable);
+
+      document.addEventListener("DOMContentLoaded", () => {
+        /* ==========================================
+               LOGIKA KONSEP 1: BENTO DINAMIS
+               ========================================== */
+        const bentoHTML = `
+                <div class="bento-item col-span-2 row-span-2 bg-blue-500 rounded-[2rem] p-6 text-white flex flex-col justify-end relative transition-transform origin-center">
+                    <h3 class="font-bold text-3xl mb-1 relative z-10">Upacara Pembukaan</h3>
+                </div>
+                <div class="bento-item col-span-1 row-span-1 bg-yellow-400 rounded-[2rem] p-5 text-yellow-950 flex flex-col justify-end relative transition-transform origin-center">
+                    <h3 class="font-bold text-xl mb-1 relative z-10">Formasi</h3>
+                </div>
+                <div class="bento-item col-span-1 row-span-2 bg-teal-500 rounded-[2rem] p-5 text-white flex flex-col justify-end relative transition-transform origin-center">
+                    <h3 class="font-bold text-2xl mb-1 relative z-10">Sinergi</h3>
+                </div>
+                <div class="bento-item col-span-1 row-span-1 bg-red-500 rounded-[2rem] p-5 text-white flex flex-col justify-center items-center relative transition-transform origin-center text-center">
+                    <h3 class="font-bold text-xl relative z-10">Karya</h3>
+                </div>
+                <div class="bento-item col-span-1 row-span-1 bg-purple-500 rounded-[2rem] p-5 text-white flex flex-col justify-end relative transition-transform origin-center">
+                    <h3 class="font-bold text-lg relative z-10">Panggung</h3>
+                </div>
+                <div class="bento-item col-span-2 row-span-1 bg-orange-500 rounded-[2rem] p-6 text-white flex flex-col justify-end relative transition-transform origin-center">
+                    <h3 class="font-bold text-2xl relative z-10">Closing Ceremony</h3>
+                </div>
+                <div class="bento-item col-span-1 row-span-1 bg-pink-500 rounded-[2rem] p-5 text-white flex flex-col justify-center items-center relative transition-transform origin-center">
+                    <h3 class="font-bold text-xl relative z-10">Galeri</h3>
+                </div>
+            `;
+        document.getElementById("bento-grid-1").innerHTML = bentoHTML;
+        document.getElementById("bento-grid-2").innerHTML = bentoHTML;
+
+        setTimeout(() => {
+          const bentoContent = document.querySelector(".bento-marquee-content");
+          const bentoBlock = document.getElementById("bento-grid-1");
+          const bentoWidth = bentoBlock.offsetWidth + 16;
+
+          const bentoAnim = gsap.to(bentoContent, {
+            x: `-=${bentoWidth}`,
+            duration: 25,
+            ease: "none",
+            repeat: -1,
+            modifiers: {
+              x: gsap.utils.unitize((x) => parseFloat(x) % bentoWidth),
+            },
+          });
+
+          let activeBento = null;
+          const allBentoItems = document.querySelectorAll(".bento-item");
+
+          function toggleBento(item, isEnter) {
+            if (isEnter) {
+              if (activeBento === item) return;
+              bentoAnim.timeScale(0);
+              activeBento = item;
+              gsap.to(item, {
+                scale: 1.15,
+                zIndex: 50,
+                boxShadow: "0px 20px 30px rgba(0,0,0,0.25)",
+                duration: 0.4,
+                ease: "back.out(1.5)",
+              });
+              allBentoItems.forEach((other) => {
+                if (other !== item)
+                  gsap.to(other, { scale: 0.85, opacity: 0.4, duration: 0.3 });
+              });
+            } else {
+              if (!activeBento) return;
+              bentoAnim.timeScale(1);
+              activeBento = null;
+              gsap.to(allBentoItems, {
+                scale: 1,
+                zIndex: 1,
+                boxShadow: "none",
+                opacity: 1,
+                duration: 0.3,
+              });
+            }
+          }
+
+          allBentoItems.forEach((item) => {
+            item.addEventListener("mouseenter", () => toggleBento(item, true));
+            item.addEventListener("mouseleave", () => toggleBento(item, false));
+            item.addEventListener("touchstart", (e) => {
+              e.preventDefault();
+              activeBento === item
+                ? toggleBento(item, false)
+                : toggleBento(item, true);
             });
+          });
+        }, 100);
 
-            // --- ANIMASI BENTO BARU (Infinite Scroll & Mobile Touch) ---
-            const bentoItems = document.querySelectorAll('.bento-item');
-            const bentoContent = document.querySelector('.bento-marquee-content');
-            const bentoBlock = document.querySelector('.bento-grid-block');
-            
-            // Timeout kecil agar DOM selesai merender lebar elemen sebelum kalkulasi loop
-            setTimeout(() => {
-                const gap = window.innerWidth < 768 ? 12 : 16; 
-                const bentoWidth = bentoBlock.offsetWidth + gap; 
-                
-                // Animasi jalan terus ke kiri (Marquee)
-                const bentoAnim = gsap.to(bentoContent, {
-                    x: `-=${bentoWidth}`,
-                    duration: 30, // Kecepatan jalan bento
-                    ease: "none",
-                    repeat: -1,
-                    modifiers: {
-                        x: gsap.utils.unitize(x => parseFloat(x) % bentoWidth)
-                    }
-                });
-
-                let activeBentoItem = null;
-
-                function activateBento(item) {
-                    if (activeBentoItem === item) return;
-                    
-                    bentoAnim.timeScale(0); // Pause scroll berjalan saat diinteraksi
-                    activeBentoItem = item;
-
-                    // Efek merenggang dramatis: Item yang disentuh membesar jauh lebih kuat
-                    gsap.to(item, {
-                        scale: 1.25, // Skala membesar 25%
-                        zIndex: 50,
-                        boxShadow: "0px 25px 35px rgba(0,0,0,0.3)", // Shadow kuat ala grand design
-                        duration: 0.5,
-                        ease: "back.out(1.7)" // Efek memantul (pop-out)
-                    });
-
-                    // Item lain disekitarnya mengecil secara drastis
-                    bentoItems.forEach(otherItem => {
-                        if (otherItem !== item) {
-                            gsap.to(otherItem, {
-                                scale: 0.85, 
-                                opacity: 0.4,
-                                duration: 0.4,
-                                ease: "power2.out"
-                            });
-                        }
-                    });
-                }
-
-                function deactivateBento() {
-                    if (!activeBentoItem) return;
-                    bentoAnim.timeScale(1); // Lanjutkan animasi berjalan
-                    activeBentoItem = null;
-
-                    // Kembalikan semua ke bentuk semula
-                    gsap.to(bentoItems, {
-                        scale: 1,
-                        zIndex: 1,
-                        boxShadow: "none",
-                        opacity: 1,
-                        duration: 0.4,
-                        ease: "power2.out"
-                    });
-                }
-
-                bentoItems.forEach(item => {
-                    // Desktop Interaksi
-                    item.addEventListener('mouseenter', () => activateBento(item));
-                    item.addEventListener('mouseleave', deactivateBento);
-
-                    // Mobile / Touch Interaksi
-                    item.addEventListener('touchstart', (e) => {
-                        if (activeBentoItem === item) {
-                            deactivateBento(); // Jika diklik lagi, dia menutup
-                        } else {
-                            activateBento(item);
-                        }
-                    }, { passive: true });
-                });
-
-                // Menutup pop-out jika layar diluar area bento disentuh (mobile friendly)
-                document.addEventListener('touchstart', (e) => {
-                    if (activeBentoItem && !e.target.closest('.bento-item')) {
-                        deactivateBento();
-                    }
-                }, { passive: true });
-
-            }, 100);
-            // --- AKHIR ANIMASI BENTO BARU ---
-
-            const colors = ['bg-blue-500', 'bg-yellow-400', 'bg-red-500', 'bg-teal-400', 'bg-purple-500', 'bg-orange-400', 'bg-pink-400', 'bg-indigo-500'];
-            const titles = ['Keseruan', 'Momen', 'Inspirasi', 'Karya', 'Sinergi', 'Fokus', 'Tawa', 'Prestasi'];
-            
-            function populateMarquee(containerId, reverse = false) {
-                const container = document.querySelector(`#${containerId} .marquee-content`);
-                let html = '';
-                
-                for(let i=0; i<16; i++) {
-                    const color = colors[i % colors.length];
-                    const title = titles[i % titles.length];
-                    const zIndexClass = i % 2 === 0 ? 'z-10' : 'z-0';
-                    const marginClass = i > 0 ? '-ml-6' : ''; 
-                    
-                    html += `
-                        <div class="w-64 h-full rounded-3xl ${color} flex items-center justify-center text-white font-bold text-xl flex-shrink-0 ${zIndexClass} ${marginClass} border-4 border-white shadow-sm hover:shadow-lg hover:z-20 hover:-translate-y-2 transition-all duration-300 cursor-pointer">
-                            ${title}
+        /* ==========================================
+               LOGIKA KONSEP 2: LORONG BERJALAN
+               ========================================== */
+        const colorsTrack = [
+          "bg-blue-500",
+          "bg-yellow-400",
+          "bg-teal-400",
+          "bg-red-500",
+          "bg-purple-500",
+          "bg-pink-400",
+        ];
+        function generateTrack(trackId, reverse) {
+          const track = document.getElementById(trackId);
+          let html = "";
+          for (let i = 0; i < 12; i++) {
+            const color = colorsTrack[i % colorsTrack.length];
+            const zClass = i % 2 === 0 ? "z-10" : "z-20";
+            const overlap = i > 0 ? "-ml-8" : "";
+            html += `
+                        <div class="lorong-item w-64 h-full rounded-2xl ${color} ${zClass} ${overlap} border-4 border-white shadow-md flex items-center justify-center text-white font-bold text-xl transition-transform cursor-pointer flex-shrink-0">
+                            PIONIR ${i + 1}
                         </div>
                     `;
-                }
-                
-                container.innerHTML = html + html; 
+          }
+          track.innerHTML = html;
 
-                const contentWidth = container.scrollWidth / 2;
-                
-                const animation = gsap.to(container, {
-                    x: reverse ? contentWidth : -contentWidth,
-                    duration: 25,
-                    ease: "none",
-                    repeat: -1,
-                    modifiers: {
-                        x: gsap.utils.unitize(x => parseFloat(x) % contentWidth)
-                    }
-                });
+          const speed = reverse ? "+=1000" : "-=1000";
+          const anim = gsap.to(track.children, {
+            x: speed,
+            duration: 20,
+            ease: "none",
+            repeat: -1,
+            modifiers: {
+              x: gsap.utils.unitize((x) => parseFloat(x) % 1000),
+            },
+          });
 
-                document.getElementById(containerId).addEventListener('mouseenter', () => {
-                    gsap.to(animation, {timeScale: 0, duration: 0.5});
-                });
-                
-                document.getElementById(containerId).addEventListener('mouseleave', () => {
-                    gsap.to(animation, {timeScale: 1, duration: 0.5});
-                });
-            }
+          Array.from(track.children).forEach((item) => {
+            item.addEventListener("mouseenter", () => {
+              anim.timeScale(0);
+              gsap.to(item, { y: -10, scale: 1.05, zIndex: 50, duration: 0.3 });
+            });
+            item.addEventListener("mouseleave", () => {
+              anim.timeScale(1);
+              const originalZ =
+                Array.from(track.children).indexOf(item) % 2 === 0 ? 10 : 20;
+              gsap.to(item, {
+                y: 0,
+                scale: 1,
+                zIndex: originalZ,
+                duration: 0.3,
+              });
+            });
+          });
+        }
+        generateTrack("track-1", false);
+        generateTrack("track-2", true);
+        generateTrack("track-3", false);
 
-            populateMarquee('track-1', false);
-            populateMarquee('track-2', true);
+        /* ==========================================
+               LOGIKA KONSEP 3: MEJA SCATTER DRAGGABLE
+               ========================================== */
+        const scatterContainer = document.getElementById("scatter-container");
+        const photoData = [
+          { color: "bg-blue-500", text: "Hari 1" },
+          { color: "bg-yellow-400", text: "Formasi" },
+          { color: "bg-pink-500", text: "Keseruan" },
+          { color: "bg-teal-500", text: "Teman Baru" },
+          { color: "bg-orange-500", text: "Closing" },
+          { color: "bg-purple-500", text: "Panggung" },
+          { color: "bg-red-500", text: "Aksi" },
+          { color: "bg-indigo-500", text: "Momen" },
+        ];
+
+        let scatterHTML = "";
+        photoData.forEach((data, i) => {
+          const rot = (Math.random() - 0.5) * 40;
+          const x = Math.random() * 60 + 10;
+          const y = Math.random() * 50 + 10;
+
+          scatterHTML += `
+                    <div class="polaroid absolute w-40 h-48 bg-white p-3 rounded-lg flex flex-col" style="left: ${x}%; top: ${y}%; transform: rotate(${rot}deg); z-index: ${i}">
+                        <div class="w-full h-full ${data.color} rounded pointer-events-none"></div>
+                        <div class="text-center font-bold text-gray-800 mt-2 pointer-events-none">${data.text}</div>
+                    </div>
+                `;
         });
+        scatterContainer.innerHTML = scatterHTML;
+
+        let highestZ = 100;
+        const polaroids = document.querySelectorAll(".polaroid");
+
+        polaroids.forEach((p) => {
+          p.dataset.isZoomed = "false";
+
+          Draggable.create(p, {
+            type: "x,y",
+            bounds: ".scatter-area",
+            onPress: function () {
+              highestZ++;
+              gsap.set(this.target, { zIndex: highestZ });
+              gsap.to(this.target, {
+                scale: 1.1,
+                boxShadow: "0px 20px 25px rgba(0,0,0,0.2)",
+                duration: 0.2,
+              });
+
+              if (this.target.dataset.isZoomed === "true") {
+                this.target.dataset.isZoomed = "false";
+              }
+            },
+            onRelease: function () {
+              if (this.target.dataset.isZoomed === "false") {
+                gsap.to(this.target, {
+                  scale: 1,
+                  boxShadow: "0px 8px 15px rgba(0,0,0,0.1)",
+                  duration: 0.2,
+                });
+              }
+            },
+          });
+
+          p.addEventListener("dblclick", function () {
+            highestZ++;
+            gsap.set(this, { zIndex: highestZ });
+
+            if (this.dataset.isZoomed === "false") {
+              this.dataset.isZoomed = "true";
+              gsap.to(this, {
+                x: 0,
+                y: 0,
+                left: "50%",
+                top: "50%",
+                xPercent: -50,
+                yPercent: -50,
+                rotation: 0,
+                scale: 2.5,
+                boxShadow: "0px 30px 40px rgba(0,0,0,0.3)",
+                duration: 0.5,
+                ease: "power3.out",
+              });
+            } else {
+              this.dataset.isZoomed = "false";
+              const newRot = (Math.random() - 0.5) * 40;
+              gsap.to(this, {
+                xPercent: 0,
+                yPercent: 0,
+                rotation: newRot,
+                scale: 1,
+                boxShadow: "0px 8px 15px rgba(0,0,0,0.1)",
+                duration: 0.4,
+              });
+            }
+          });
+        });
+
+        /* ==========================================
+               LOGIKA KONSEP 4: TIRAI PEMBUKA (ENHANCED)
+               ========================================== */
+        const tiraiContainer = document.getElementById("tirai-container");
+        let bilahHTML = "";
+        // Membuat grid anyaman (50 kotak)
+        for (let i = 0; i < 50; i++) {
+          const bg =
+            Math.floor(i / 10) % 2 === 0
+              ? i % 2 === 0
+                ? "bg-gray-800"
+                : "bg-gray-900"
+              : i % 2 === 0
+                ? "bg-gray-900"
+                : "bg-gray-800";
+
+          bilahHTML += `<div class="tirai-bilah ${bg} w-full h-full border border-gray-700/50 shadow-inner"></div>`;
+        }
+        tiraiContainer.innerHTML = bilahHTML;
+
+        const bilahElements = document.querySelectorAll(".tirai-bilah");
+        const galeriItems = document.querySelectorAll(".galeri-item");
+        const welcomeText = document.getElementById("welcome-text");
+
+        let isTiraiAnimating = false;
+
+        function playTirai() {
+          if (isTiraiAnimating) return; // Cegah spam klik saat animasi jalan
+          isTiraiAnimating = true;
+
+          const tl = gsap.timeline({
+            onComplete: () => (isTiraiAnimating = false),
+          });
+
+          // Reset semua elemen ke state awal secara instan
+          gsap.set(bilahElements, {
+            opacity: 1,
+            scale: 1,
+            x: 0,
+            y: 0,
+            rotationZ: 0,
+          });
+          gsap.set(galeriItems, { opacity: 0, scale: 0.2, y: 50 }); // Galeri sembunyi di bawah dan kecil
+          gsap.set(welcomeText, { opacity: 0, scale: 0.5, y: 30 }); // Teks sembunyi
+
+          // Tahap 1: Tirai meledak/terbang menyebar ke arah layar
+          tl.to(bilahElements, {
+            scale: 2.5,
+            opacity: 0,
+            rotationZ: "random(-45, 45)", // Melintir acak
+            duration: 1.2,
+            stagger: {
+              amount: 0.8,
+              grid: [5, 10],
+              from: "center", // Menyebar dari tengah
+            },
+            ease: "power3.in",
+          })
+
+            // Tahap 2: Kotak galeri bermunculan melompat satu-persatu
+            .to(
+              galeriItems,
+              {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: "back.out(1.7)", // Efek memantul
+              },
+              "-=0.6",
+            ) // overlap (mulai sebelum tirai selesai hilang)
+
+            // Tahap 3: Teks raksasa menabrak layar dengan elastis
+            .to(
+              welcomeText,
+              {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 1.2,
+                ease: "elastic.out(1, 0.4)", // Efek getar karet
+              },
+              "-=0.4",
+            );
+        }
+
+        // Mainkan manual dengan tombol
+        document
+          .getElementById("btn-replay-tirai")
+          .addEventListener("click", playTirai);
+
+        // Auto-play pertama kali saat digeser/scroll ke section 4
+        let playedOnce = false;
+        const observer = new IntersectionObserver(
+          (entries) => {
+            if (entries[0].isIntersecting && !playedOnce) {
+              playedOnce = true;
+              // Jeda sebentar sebelum mulai otomatis
+              setTimeout(playTirai, 500);
+            }
+          },
+          { threshold: 0.5 },
+        );
+        observer.observe(document.getElementById("konsep-4"));
+      });
     </script>
-</body>
+  </body>
 </html>
